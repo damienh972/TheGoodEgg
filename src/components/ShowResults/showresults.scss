@@ -1,0 +1,92 @@
+@import '@/assets/css/base.scss';
+
+.results {
+  padding-top: 20px;
+  height: 100%;
+
+  .vue-recycle-scroller__item-view {
+    overflow-y: auto;
+    transform: none !important;
+  }
+  .egg-entry {
+    box-shadow: rgba(0, 0, 0, 0.45) 0px 25px 20px -20px;
+    .results__title {
+      padding-right: 30px;
+      padding-top: 20px;
+      font-weight: bold;
+      font-family: Roboto;
+    }
+    p {
+      font-size: 24px;
+    }
+  }
+  hr {
+    width: 100%;
+    border: solid 2px black;
+  }
+}
+
+.no-entries {
+  height: 100%;
+  img {
+    width: 100%;
+    position: fixed;
+    top: 0;
+  }
+}
+
+.infinite-scroll {
+  height: 80vh;
+  overflow-y: auto;
+}
+
+.egg-item {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.loading {
+  text-align: center;
+  padding: 10px;
+}
+
+.error {
+  color: red;
+  text-align: center;
+  padding: 10px;
+}
+
+@media only screen and (min-width: 769px) {
+  .no-entries {
+    height: 100vh;
+    img {
+      width: 40%;
+      top: 0;
+      bottom: unset;
+    }
+  }
+}
+
+/* Custom Scrollbar Styles */
+ul::-webkit-scrollbar {
+  width: 10px;
+  border-radius: 10px;
+}
+
+ul::-webkit-scrollbar-track {
+  background: var(--color-primary);
+  border-radius: 10px;
+}
+
+ul::-webkit-scrollbar-thumb {
+  background: black;
+  -webkit-border-radius: 10px !important;
+  border-radius: 10px !important;
+}
+
+/* Firefox scrollbar styles */
+ul {
+  scrollbar-width: thin;
+  border-radius: 20px;
+  scrollbar-color: black var(--color-primary);
+}
