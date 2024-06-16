@@ -98,6 +98,10 @@ const getCloneId = (egg) => {
         />
       </nav>
     </div>
+    <a href="https://x.com/damian_shard" target="_blank" class="sig">
+      <p>Made with ❤️ by</p>
+      <img src="/assets/images/clone_436.png" />
+    </a>
   </header>
   <main>
     <ShowResults

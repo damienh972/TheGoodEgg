@@ -8,18 +8,32 @@
     position: sticky;
     top: 0;
     background-color: var(--color-primary);
-    padding-top: 1rem;
+    padding-top: 0.5rem;
     z-index: 1;
 
     h1 {
+      color: black;
       margin: 0;
       font-size: 2rem;
       font-weight: 800;
     }
+    .sig {
+      position: absolute;
+      width: 60px;
+      font-size: 12px;
+      top: 66px;
+      right: 10px;
+      img {
+        width: 40px;
+        position: absolute;
+        bottom: -46px;
+        right: 15px;
+      }
+    }
   }
 
   main {
-    height: calc(100vh - 178px);
+    height: calc(100vh - 170px);
   }
 
   .loading {
@@ -87,5 +101,16 @@
   #app {
     width: 80%;
     margin-left: auto;
+    header {
+      .sig {
+        width: 80px;
+        top: 20px !important;
+        font-size: 14px;
+        img {
+          width: 50px;
+          bottom: -46px;
+        }
+      }
+    }
   }
 }
