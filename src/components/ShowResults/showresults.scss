@@ -2,30 +2,29 @@
 
 .results {
   padding-top: 20px;
-  height: 100%;
+  min-height: 100vh;
+  .infinite-scroll {
+    height: 100vh;
+    overflow-y: scroll;
 
-  .vue-recycle-scroller__item-view {
-    overflow-y: auto;
-    transform: none !important;
-  }
-  .egg-entry {
-    box-shadow: rgba(0, 0, 0, 0.45) 0px 25px 20px -20px;
-    .results__title {
-      padding-right: 30px;
-      padding-top: 20px;
-      font-weight: bold;
-      font-family: Roboto;
+    .egg-entry {
+      box-shadow: rgba(0, 0, 0, 0.45) 0px 25px 20px -20px;
+      .results__title {
+        padding-right: 30px;
+        padding-top: 20px;
+        font-weight: bold;
+        font-family: Roboto;
+      }
+      p {
+        font-size: 24px;
+      }
     }
-    p {
-      font-size: 24px;
+    hr {
+      width: 100%;
+      border: solid 2px black;
     }
-  }
-  hr {
-    width: 100%;
-    border: solid 2px black;
   }
 }
-
 .no-entries {
   height: 100%;
   img {
@@ -33,11 +32,6 @@
     position: fixed;
     top: 0;
   }
-}
-
-.infinite-scroll {
-  height: 80vh;
-  overflow-y: auto;
 }
 
 .egg-item {

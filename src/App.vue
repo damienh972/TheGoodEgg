@@ -13,9 +13,12 @@ const selectedDnaTrait = ref('')
 const selectedBoostTraits = ref([])
 const selectedPoints = ref(null)
 
+const loading = ref(false)
+const error = ref('')
+
 const pointsOptions = computed(() => {
   const uniquePoints = [...new Set(store.lBoard.map((egg) => egg.points))]
-  return uniquePoints.sort((a, b) => a - b)
+  return uniquePoints.filter((point) => !isNaN(point)).sort((a, b) => a - b)
 })
 
 const filteredEgg = computed(() =>
@@ -98,10 +101,6 @@ const getCloneId = (egg) => {
         />
       </nav>
     </div>
-    <a href="https://x.com/damian_shard" target="_blank" class="sig">
-      <p>Made with ❤️ by</p>
-      <img src="/assets/images/clone_436.png" />
-    </a>
   </header>
   <main>
     <ShowResults

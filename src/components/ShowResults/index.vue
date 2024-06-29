@@ -64,7 +64,7 @@ const onScroll = () => {
 onMounted(async () => {
   try {
     await store.loadLBoard()
-    initializeDisplayedLBoard()
+    await initializeDisplayedLBoard()
     nextTick(() => {
       if (scrollContainer.value && typeof scrollContainer.value.addEventListener === 'function') {
         scrollContainer.value.addEventListener('scroll', onScroll)
@@ -87,7 +87,12 @@ onMounted(async () => {
         <h2 class="results__title">Egg #{{ item.tokenId }}</h2>
         <li>
           <img :src="getTraitImage('black', 'egg')" alt="egg" />
-          <p>{{ item.points }} pts</p>
+          <p>
+            {{
+              typeof item.points === 'number' && !isNaN(item.points) ? item.points + ' pts' : 'N/A'
+            }}
+            pts
+          </p>
           <a
             :href="`https://magiceden.io/item-details/ethereum/0x6c410cf0b8c113dc6a7641b431390b11d5515082/${item.tokenId}`"
             target="blank"

@@ -1,3 +1,5 @@
+@import 'vue-select/dist/vue-select.css';
+
 .burger-menu {
   width: 100%;
   height: 40px;
@@ -74,12 +76,44 @@
       font-weight: normal;
     }
   }
+  .points {
+    #vs1__combobox {
+      border: 2px solid #fed712;
+    }
+    .vs__option:hover {
+      background-color: #fed712;
+    }
+    .vs__selected,
+    .vs__search::placeholder,
+    .vs__dropdown-toggle,
+    .vs__dropdown-menu {
+      background: black;
+      border: none;
+      color: #fed712;
+      text-transform: lowercase;
+      font-variant: small-caps;
+    }
+    .vs__clear,
+    .vs__open-indicator {
+      fill: #fed712;
+    }
+  }
 
-  #points {
-    width: 80px;
-    height: 20px;
-    margin-left: 20px;
-    border-radius: 5px;
+  .sig {
+    margin: 20px auto 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 90px;
+    font-size: 10px;
+
+    p {
+      margin: 0 auto;
+    }
+    img {
+      width: 50px;
+    }
   }
 }
 

@@ -44,20 +44,18 @@ const updateEggId = (event) => {
           <img :src="meButton" alt="link" class="me-button" />
         </a>
       </li>
-      <template v-if="filteredEgg.bonusTraits[0]">
-        <li>
-          <img
-            :src="getTraitImage('black', filteredEgg.bonusTraits[0])"
-            :alt="filteredEgg.bonusTraits[0]"
-          />
-          <p>{{ filteredEgg.bonusTraits[0] }} DNA</p>
-          <img
-            class="clone-pfp"
-            :src="`https://clonex-assets.rtfkt.com/images/${getCloneId(filteredEgg)}.png`"
-            alt="clone pfp"
-          />
-        </li>
-      </template>
+      <li v-if="filteredEgg.bonusTraits[0]">
+        <img
+          :src="getTraitImage('black', filteredEgg.bonusTraits[0])"
+          :alt="filteredEgg.bonusTraits[0]"
+        />
+        <p>{{ filteredEgg.bonusTraits[0] }} DNA</p>
+        <img
+          class="clone-pfp"
+          :src="`https://clonex-assets.rtfkt.com/images/${getCloneId(filteredEgg)}.png`"
+          alt="clone pfp"
+        />
+      </li>
       <template v-if="filteredEgg.bonusTraits.length > 1">
         <li v-for="(trait, index) in filteredEgg.bonusTraits.slice(1)" :key="index">
           <img :src="getTraitImage('black', trait)" :alt="trait" />

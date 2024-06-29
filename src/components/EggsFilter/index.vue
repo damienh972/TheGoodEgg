@@ -1,6 +1,7 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <!-- eslint-disable no-unused-vars -->
 <!-- src/components/EggsFilter.vue -->
+
 <script setup>
 import { ref, watch } from 'vue'
 import './eggsfilter.scss'
@@ -18,18 +19,17 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:selectedPoints'])
-
-const internalSelectedPoints = ref(props.selectedPoints)
+const internalSelectedPoints = ref(props.selectedPoints || null)
 
 watch(
   () => props.selectedPoints,
   (newVal) => {
-    internalSelectedPoints.value = newVal
+    internalSelectedPoints.value = newVal || null
   }
 )
 
-const updateSelectedPoints = (event) => {
-  internalSelectedPoints.value = parseInt(event.target.value, 10)
+const updateSelectedPoints = (value) => {
+  internalSelectedPoints.value = parseInt(value, 10)
   emit('update:selectedPoints', internalSelectedPoints.value)
 }
 
@@ -39,7 +39,7 @@ const toggleMenu = () => {
 }
 </script>
 <template>
-  <div class="burger-menu" @click="toggleMenu">
+  <div v-if="selectedPoints !== null" class="burger-menu" @click="toggleMenu">
     <div :class="{ 'burger-open': isMenuOpen }">
       <span></span>
       <span></span>
@@ -82,11 +82,18 @@ const toggleMenu = () => {
     </div>
     <div class="egg-filter__points">
       <label for="points">Filter by Points:</label>
-      <select v-model="internalSelectedPoints" @change="updateSelectedPoints" id="points">
-        <option v-for="point in pointsOptions" :key="point" :value="point">
-          {{ point }}
-        </option>
-      </select>
+      <v-select
+        class="points"
+        :options="pointsOptions"
+        v-model="internalSelectedPoints"
+        @update:modelValue="updateSelectedPoints"
+        :reduce="(point) => point"
+        label="point"
+      />
     </div>
+    <a href="https://x.com/damian_shard" target="_blank" class="sig">
+      <p>Made with ❤️ by</p>
+      <img src="/assets/images/clone_436.png" />
+    </a>
   </section>
 </template>

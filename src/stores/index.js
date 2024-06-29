@@ -20,8 +20,13 @@ export const useLBoardStore = defineStore('leaderboard', {
       try {
         const response = await fetch('/lboard.json');
         const data = await response.json();
-        this.lBoard = data;
-        this.totalPages = Math.ceil(this.lBoard.length / this.itemsPerPage);
+        if (Array.isArray(data)) {
+          const validData = await data.filter(item => typeof item.points === 'number' && !isNaN(item.points));
+          this.lBoard = validData;
+          this.totalPages = Math.ceil(this.lBoard.length / this.itemsPerPage);
+        } else {
+          console.error('Invalid data format:', data);
+        }
       } catch (error) {
         this.error = error.message;
       } finally {
