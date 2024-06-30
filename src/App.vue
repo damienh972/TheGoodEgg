@@ -1,6 +1,6 @@
 <!-- src/App.vue -->
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useLBoardStore } from './stores/leaderboard'
 import { useListingsStore } from '@/stores/listings'
 import { EggsFilter, FindEgg, ShowResults } from '@components'
@@ -26,6 +26,12 @@ const loading = ref(false)
 const loadingMessage = ref('Loading ...')
 const error = ref('')
 const filterOnSale = ref(false)
+
+const refreshEnabled = ref(false)
+const timeSinceLastUpdate = ref(0)
+const intervalId = ref(null)
+
+const LAST_UPDATE_KEY = 'listings_timestamp'
 
 const pointsOptions = computed(() => {
   const uniquePoints = [...new Set(lBoardStore.lBoard.map((egg) => egg.points))]
@@ -129,6 +135,47 @@ const getCloneId = (egg) => {
   return bonusTokenId
 }
 
+const updateRefreshStatus = () => {
+  const lastUpdate = localStorage.getItem(LAST_UPDATE_KEY)
+  if (lastUpdate) {
+    const parsedLastUpdate = parseInt(lastUpdate, 10)
+    if (!isNaN(parsedLastUpdate)) {
+      const now = Date.now()
+      const timeElapsed = Math.floor((now - parsedLastUpdate) / 1000)
+      console.log('Time elapsed:', timeElapsed) // Add this for debugging
+      if (!isNaN(timeElapsed)) {
+        timeSinceLastUpdate.value = timeElapsed
+        refreshEnabled.value = timeElapsed > 300
+      } else {
+        console.error('Time elapsed calculation resulted in NaN')
+        timeSinceLastUpdate.value = 0
+        refreshEnabled.value = true
+      }
+    } else {
+      console.error('Parsed last update is NaN')
+      timeSinceLastUpdate.value = 0
+      refreshEnabled.value = true
+    }
+  } else {
+    console.error('No last update found in localStorage')
+    timeSinceLastUpdate.value = 0
+    refreshEnabled.value = true
+  }
+}
+
+watch(
+  () => localStorage.getItem(LAST_UPDATE_KEY),
+  (newTimestamp, oldTimestamp) => {
+    if (newTimestamp !== oldTimestamp) {
+      updateRefreshStatus()
+    }
+  }
+)
+
+const refreshPage = () => {
+  window.location.reload()
+}
+
 onMounted(async () => {
   loading.value = true
   try {
@@ -144,6 +191,14 @@ onMounted(async () => {
     error.value = error
   } finally {
     loading.value = false
+    updateRefreshStatus()
+    intervalId.value = setInterval(updateRefreshStatus, 1000)
+  }
+})
+
+onUnmounted(() => {
+  if (intervalId.value) {
+    clearInterval(intervalId.value)
   }
 })
 </script>
@@ -183,6 +238,9 @@ onMounted(async () => {
         @filter-change="handleFilterChange"
       />
     </nav>
+    <button @click="refreshPage" :disabled="!refreshEnabled">
+      {{ refreshEnabled ? 'Refresh' : `Refresh in ${300 - timeSinceLastUpdate}s` }}
+    </button>
   </header>
   <main>
     <ShowResults
