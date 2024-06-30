@@ -59,11 +59,64 @@
   .egg-filter__box {
     cursor: pointer;
   }
-  p,
   .egg-filter__points {
-    margin-right: auto;
-    width: fit-content;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-wrap: wrap;
+    min-height: 200px;
     padding: 10px;
+
+    .egg-filter__container {
+      display: flex;
+      flex-direction: column;
+      height: 60px;
+
+      label {
+        margin-bottom: 10px;
+      }
+
+      .points {
+        .vs__dropdown-toggle {
+          border: 2px solid #fed712 !important;
+        }
+        .vs__option:hover {
+          background-color: #fed712;
+        }
+        .vs__selected,
+        .vs__search::placeholder,
+        .vs__dropdown-toggle,
+        .vs__dropdown-menu {
+          background: black;
+          border: none;
+          color: #fed712;
+          text-transform: lowercase;
+          font-variant: small-caps;
+        }
+        .vs__clear,
+        .vs__open-indicator {
+          fill: #fed712;
+        }
+      }
+      .sale {
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #fed712;
+        border-radius: 4px;
+        position: relative;
+        cursor: pointer;
+        &:checked {
+          background-color: #fed712;
+        }
+        &:disabled {
+          background-color: #f0f0f0;
+          border-color: #ddd;
+          cursor: not-allowed;
+          opacity: 0.6;
+        }
+      }
+    }
   }
   .eggs-filter__dna,
   .egg-filter__boost {
@@ -76,29 +129,6 @@
       font-weight: normal;
     }
   }
-  .points {
-    #vs1__combobox {
-      border: 2px solid #fed712;
-    }
-    .vs__option:hover {
-      background-color: #fed712;
-    }
-    .vs__selected,
-    .vs__search::placeholder,
-    .vs__dropdown-toggle,
-    .vs__dropdown-menu {
-      background: black;
-      border: none;
-      color: #fed712;
-      text-transform: lowercase;
-      font-variant: small-caps;
-    }
-    .vs__clear,
-    .vs__open-indicator {
-      fill: #fed712;
-    }
-  }
-
   .sig {
     margin: 20px auto 0 auto;
     display: flex;

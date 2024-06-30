@@ -3,7 +3,7 @@
 <!-- src/components/ShowResults.vue -->
 <script setup>
 import { ref, watch, onMounted, computed, nextTick } from 'vue'
-import { useLBoardStore } from '@/stores'
+// import { useLBoardStore } from '@/stores/leaderboard'
 import './showresults.scss'
 import eggGif from '@assets/video/egg.webp'
 import meButton from '@assets/images/me.svg'
@@ -11,17 +11,22 @@ import meButton from '@assets/images/me.svg'
 const props = defineProps({
   filteredEggs: Array,
   getTraitImage: Function,
-  getCloneId: Function
+  getCloneId: Function,
+  loading: Boolean
 })
 
-const store = useLBoardStore()
+// const store = useLBoardStore()
 const scrollContainer = ref(null)
-const loading = ref(false)
+const loadingScroll = ref(false)
 const error = ref(null)
 const itemsPerPage = 10
 const currentPage = ref(1)
 
 const displayedLBoard = ref([])
+
+const roundUpToTwoDecimals = (num) => {
+  return Math.ceil(num * 100) / 100
+}
 
 const initializeDisplayedLBoard = () => {
   displayedLBoard.value = props.filteredEggs.slice(0, itemsPerPage)
@@ -35,9 +40,16 @@ watch(
   },
   { immediate: true }
 )
+
+watch(scrollContainer, async (newValue) => {
+  if (newValue) {
+    await attachScrollListener()
+  }
+})
+
 const loadMore = async () => {
-  if (!loading.value) {
-    loading.value = true
+  if (!loadingScroll.value) {
+    loadingScroll.value = true
     try {
       const start = (currentPage.value - 1) * itemsPerPage
       const end = currentPage.value * itemsPerPage
@@ -47,7 +59,7 @@ const loadMore = async () => {
     } catch (err) {
       error.value = err.message
     } finally {
-      loading.value = false
+      loadingScroll.value = false
     }
   }
 }
@@ -61,37 +73,36 @@ const onScroll = () => {
   }
 }
 
+const attachScrollListener = async () => {
+  await nextTick()
+  if (scrollContainer.value && typeof scrollContainer.value.addEventListener === 'function') {
+    scrollContainer.value.addEventListener('scroll', onScroll)
+  }
+}
+
 onMounted(async () => {
   try {
-    await store.loadLBoard()
     await initializeDisplayedLBoard()
-    nextTick(() => {
-      if (scrollContainer.value && typeof scrollContainer.value.addEventListener === 'function') {
-        scrollContainer.value.addEventListener('scroll', onScroll)
-      } else {
-        console.error(
-          'scrollContainer is not a DOM element or component element:',
-          scrollContainer.value
-        )
-      }
-    })
+    await attachScrollListener()
   } catch (error) {
     console.error('Error in onMounted:', error)
   }
 })
 </script>
 <template>
-  <div v-if="filteredEggs.length > 0" class="results">
+  <section v-if="filteredEggs.length > 0 && !loading" class="results">
     <ul class="infinite-scroll" ref="scrollContainer">
       <div v-for="(item, index) in displayedLBoard" class="egg-entry" :key="index">
-        <h2 class="results__title">Egg #{{ item.tokenId }}</h2>
+        <li class="egg-entry__title">
+          <h2 class="results__title">Egg #{{ item.tokenId }}</h2>
+          <p class="price" v-if="item.price">{{ roundUpToTwoDecimals(item.price) }} eth</p>
+        </li>
         <li>
           <img :src="getTraitImage('black', 'egg')" alt="egg" />
           <p>
             {{
               typeof item.points === 'number' && !isNaN(item.points) ? item.points + ' pts' : 'N/A'
             }}
-            pts
           </p>
           <a
             :href="`https://magiceden.io/item-details/ethereum/0x6c410cf0b8c113dc6a7641b431390b11d5515082/${item.tokenId}`"
@@ -120,10 +131,9 @@ onMounted(async () => {
         <hr />
       </div>
     </ul>
-    <div v-if="loading" class="loading">Loading...</div>
-  </div>
-
-  <div v-else class="results no-entries">
+    <div v-if="loadingScroll" class="loading">Loading datas...</div>
+  </section>
+  <div v-if="!loading && filteredEggs.length === 0" class="results no-entries">
     <img :src="eggGif" alt="egg gif" />
   </div>
 </template>

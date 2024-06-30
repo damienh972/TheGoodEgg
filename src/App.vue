@@ -1,10 +1,18 @@
 <!-- src/App.vue -->
 <script setup>
-import { ref, computed } from 'vue'
-import { useLBoardStore } from './stores'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useLBoardStore } from './stores/leaderboard'
+import { useListingsStore } from '@/stores/listings'
 import { EggsFilter, FindEgg, ShowResults } from '@components'
 
-const store = useLBoardStore()
+console.log('%cHey there, curious developer!', 'color: green; font-size: 20px;')
+console.log(
+  '%cWelcome to the secret console of this website. Have fun exploring!',
+  'color: blue; font-size: 16px;'
+)
+
+const lBoardStore = useLBoardStore()
+const listingsStore = useListingsStore()
 const eggId = ref('')
 const dnaTraits = ['Alien', 'Murakami', 'Undead', 'Reptile', 'Angel', 'Demon', 'Robot', 'Human']
 
@@ -12,34 +20,83 @@ const boostTraits = ['Murakami Drip', 'Helmet', 'Snake']
 const selectedDnaTrait = ref('')
 const selectedBoostTraits = ref([])
 const selectedPoints = ref(null)
+const filteredEggs = ref([])
 
 const loading = ref(false)
+const loadingMessage = ref('Loading ...')
 const error = ref('')
+const filterOnSale = ref(false)
 
 const pointsOptions = computed(() => {
-  const uniquePoints = [...new Set(store.lBoard.map((egg) => egg.points))]
-  return uniquePoints.filter((point) => !isNaN(point)).sort((a, b) => a - b)
+  const uniquePoints = [...new Set(lBoardStore.lBoard.map((egg) => egg.points))]
+  return uniquePoints.filter((point) => !isNaN(point)).sort((a, b) => b - a)
 })
 
-const filteredEgg = computed(() =>
-  store.lBoard.find((egg) => egg.tokenId === parseInt(eggId.value))
-)
-
-const filteredEggs = computed(() => {
-  return store.lBoard.filter((egg) => {
-    const matchesDnaTrait = selectedDnaTrait.value
-      ? egg.bonusTraits.includes(selectedDnaTrait.value)
-      : true
-    const matchesBoostTraits = selectedBoostTraits.value.length
-      ? selectedBoostTraits.value.every((trait) => egg.bonusTraits.includes(trait))
-      : true
-    const matchesPoints = selectedPoints.value ? egg.points === selectedPoints.value : true
-    return matchesDnaTrait && matchesBoostTraits && matchesPoints
+const eggsWithPrice = computed(() => {
+  return lBoardStore.lBoard.map((egg) => {
+    const price = getListingPrice(egg.tokenId)
+    return {
+      ...egg,
+      price: price
+    }
   })
 })
 
+const filteredEgg = computed(() =>
+  lBoardStore.lBoard.find((egg) => egg.tokenId === parseInt(eggId.value))
+)
+
+const totalEggsWithPrice = computed(() => {
+  return filteredEggs.value.filter((egg) => egg.price !== null).length
+})
+
+const getListingPrice = (tokenId) => {
+  const listing = listingsStore.listings.find(
+    (listing) => parseInt(listing.nft_details.token_id, 10) === tokenId
+  )
+  return listing ? listing.price / 1e18 : null
+}
+
+const applyFilters = () => {
+  let eggs = eggsWithPrice.value
+
+  if (selectedDnaTrait.value) {
+    eggs = eggs.filter((egg) => egg.bonusTraits.includes(selectedDnaTrait.value))
+  }
+
+  if (selectedBoostTraits.value.length) {
+    eggs = eggs.filter((egg) =>
+      selectedBoostTraits.value.every((trait) => egg.bonusTraits.includes(trait))
+    )
+  }
+
+  if (selectedPoints.value !== null) {
+    eggs = eggs.filter((egg) => egg.points <= selectedPoints.value)
+  }
+
+  if (filterOnSale.value) {
+    const listingIds = listingsStore.listings.map((listing) =>
+      parseInt(listing.nft_details.token_id, 10)
+    )
+    const uniqueListings = Array.from(new Set(listingIds))
+    eggs = eggs.filter((egg) => uniqueListings.includes(egg.tokenId))
+  }
+
+  filteredEggs.value = eggs
+}
+
+watch([selectedDnaTrait, selectedBoostTraits, selectedPoints, filterOnSale], applyFilters, {
+  deep: true
+})
+
+const handleFilterChange = (onSale) => {
+  filterOnSale.value = onSale
+  applyFilters()
+}
+
 const selectDnaTrait = (trait) => {
   selectedDnaTrait.value = selectedDnaTrait.value === trait ? '' : trait
+  applyFilters()
 }
 
 const selectBoostTrait = (trait) => {
@@ -50,6 +107,7 @@ const selectBoostTrait = (trait) => {
       selectedBoostTraits.value.push(trait)
     }
   }
+  applyFilters()
 }
 
 const getTraitImage = (color, trait) => {
@@ -70,43 +128,68 @@ const getCloneId = (egg) => {
   })
   return bonusTokenId
 }
+
+onMounted(async () => {
+  loading.value = true
+  try {
+    loadingMessage.value = 'Retrieving incubation datas...'
+    await lBoardStore.loadLBoard()
+    loadingMessage.value = 'Retrieving listings datas...'
+    await listingsStore.fetchListings()
+    loadingMessage.value = 'Initializing eggs results...'
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+    applyFilters()
+  } catch (error) {
+    console.error('Error in onMounted:', error)
+    error.value = error
+  } finally {
+    loading.value = false
+  }
+})
 </script>
 
 <template>
-  <header>
+  <div v-if="error" class="error">{{ error }}</div>
+  <div v-if="loading" class="loader">
     <h1>TheGoodEgg</h1>
+    <p>{{ loadingMessage }}</p>
+    <img :src="getTraitImage('white', 'egg')" alt="egg" />
+  </div>
+
+  <header v-else>
     <!-- <button @click="store.fetchAndSaveLBoard">Fetch Lboard</button> -->
-    <div v-if="loading" class="loading">Loading...</div>
-    <div v-if="error" class="error">{{ error }}</div>
-    <div v-if="!loading && !error">
-      <nav>
-        <FindEgg
-          :egg-id="parseInt(eggId)"
-          :get-trait-image="getTraitImage"
-          :filtered-egg="filteredEgg"
-          :get-clone-id="getCloneId"
-          @update:eggId="eggId = $event"
-        />
-        <EggsFilter
-          :dna-traits="dnaTraits"
-          :boost-traits="boostTraits"
-          :selected-dna-trait="selectedDnaTrait"
-          :selected-boost-traits="selectedBoostTraits"
-          :select-dna-trait="selectDnaTrait"
-          :select-boost-trait="selectBoostTrait"
-          :get-trait-image="getTraitImage"
-          :selected-points="selectedPoints"
-          :points-options="pointsOptions"
-          @update:selectedPoints="selectedPoints = $event"
-        />
-      </nav>
-    </div>
+    <h1>TheGoodEgg</h1>
+    <nav>
+      <FindEgg
+        :egg-id="parseInt(eggId)"
+        :get-trait-image="getTraitImage"
+        :filtered-egg="filteredEgg"
+        :get-clone-id="getCloneId"
+        @update:eggId="eggId = $event"
+      />
+      <EggsFilter
+        :dna-traits="dnaTraits"
+        :boost-traits="boostTraits"
+        :selected-dna-trait="selectedDnaTrait"
+        :selected-boost-traits="selectedBoostTraits"
+        :select-dna-trait="selectDnaTrait"
+        :select-boost-trait="selectBoostTrait"
+        :get-trait-image="getTraitImage"
+        :selected-points="selectedPoints"
+        :points-options="pointsOptions"
+        :total-eggs-with-price="totalEggsWithPrice"
+        :loading="loading"
+        @update:selectedPoints="selectedPoints = $event"
+        @filter-change="handleFilterChange"
+      />
+    </nav>
   </header>
   <main>
     <ShowResults
       :filtered-eggs="filteredEggs"
       :get-trait-image="getTraitImage"
       :get-clone-id="getCloneId"
+      :loading="loading"
     />
   </main>
 </template>
