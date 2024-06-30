@@ -19,7 +19,6 @@ export const useListingsStore = defineStore('listings', {
       const cachedTimestamp = localStorage.getItem(LOCAL_STORAGE_TIMESTAMP_KEY);
       const currentTime = new Date().getTime();
 
-      // Use cached data if it's less than 5 minutes old
       if (cachedListings && cachedTimestamp && (currentTime - cachedTimestamp < 5 * 60 * 1000)) {
         this.listings = cachedListings;
         return;

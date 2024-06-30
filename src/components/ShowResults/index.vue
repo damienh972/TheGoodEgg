@@ -3,7 +3,6 @@
 <!-- src/components/ShowResults.vue -->
 <script setup>
 import { ref, watch, onMounted, computed, nextTick } from 'vue'
-// import { useLBoardStore } from '@/stores/leaderboard'
 import './showresults.scss'
 import eggGif from '@assets/video/egg.webp'
 import meButton from '@assets/images/me.svg'
@@ -15,7 +14,6 @@ const props = defineProps({
   loading: Boolean
 })
 
-// const store = useLBoardStore()
 const scrollContainer = ref(null)
 const loadingScroll = ref(false)
 const error = ref(null)

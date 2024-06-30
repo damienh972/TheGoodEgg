@@ -142,7 +142,6 @@ const updateRefreshStatus = () => {
     if (!isNaN(parsedLastUpdate)) {
       const now = Date.now()
       const timeElapsed = Math.floor((now - parsedLastUpdate) / 1000)
-      console.log('Time elapsed:', timeElapsed) // Add this for debugging
       if (!isNaN(timeElapsed)) {
         timeSinceLastUpdate.value = timeElapsed
         refreshEnabled.value = timeElapsed > 300
