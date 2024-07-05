@@ -6,6 +6,7 @@
   .infinite-scroll {
     height: 100vh;
     overflow-y: scroll;
+    scrollbar-width: thin;
 
     .egg-entry {
       transform: scale(0.9);
