@@ -43,7 +43,7 @@ const eggsWithPrice = computed(() => {
     const price = getListingPrice(egg.tokenId)
     return {
       ...egg,
-      price: price
+      price
     }
   })
 })
@@ -191,7 +191,7 @@ onMounted(async () => {
   } finally {
     loading.value = false
     updateRefreshStatus()
-    intervalId.value = setInterval(updateRefreshStatus, 1000)
+    intervalId.value = setInterval(updateRefreshStatus, 500)
   }
 })
 
