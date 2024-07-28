@@ -121,8 +121,10 @@ onMounted(async () => {
         </li>
         <template v-if="item.bonusTraits.length > 1">
           <li v-for="(trait, index) in item.bonusTraits.slice(1)" :key="index">
-            <img :src="getTraitImage('black', trait)" :alt="trait" />
-            <p>{{ trait }} Boost</p>
+            <div class="trait-image-box">
+              <img :src="getTraitImage('black', trait)" :alt="trait" />
+            </div>
+            <p>{{ trait }} {{ trait !== 'Artist Edition' ? 'Boost' : '' }}</p>
             <div class="button-secondary cta-hidden"></div>
           </li>
         </template>

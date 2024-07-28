@@ -16,7 +16,7 @@ const listingsStore = useListingsStore()
 const eggId = ref('')
 const dnaTraits = ['Alien', 'Murakami', 'Undead', 'Reptile', 'Angel', 'Demon', 'Robot', 'Human']
 
-const boostTraits = ['Murakami Drip', 'Helmet', 'Snake']
+const boostTraits = ['Murakami Drip', 'Helmet', 'Snake', 'Artist Edition']
 const selectedDnaTrait = ref('')
 const selectedBoostTraits = ref([])
 const selectedPoints = ref(null)
@@ -117,9 +117,13 @@ const selectBoostTrait = (trait) => {
 }
 
 const getTraitImage = (color, trait) => {
+  if (trait === 'Artist Edition') {
+    return `/assets/images/rtfkt_bonus_${color}/ae.svg`
+  }
   if (trait === 'Murakami Drip') {
     return `/assets/images/rtfkt_bonus_${color}/mkd.svg`
   }
+
   return `/assets/images/rtfkt_bonus_${color}/${trait.toLowerCase()}.svg`
 }
 

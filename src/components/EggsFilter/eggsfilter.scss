@@ -58,6 +58,11 @@
   scrollbar-width: thin;
 
   .egg-filter__box {
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80px;
     cursor: pointer;
     transition: all 0.4s ease;
     &:hover {
@@ -138,6 +143,17 @@
       font-weight: normal;
     }
   }
+  .hint {
+    display: none;
+  }
+
+  .visible {
+    display: block;
+    font-size: 10px;
+    font-style: italic;
+    color: #fed712;
+  }
+
   .sig {
     margin: 20px auto 0 auto;
     display: flex;

@@ -28,6 +28,14 @@
           font-size: 24px;
         }
       }
+
+      .trait-image-box {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 72px;
+        width: 72px;
+      }
     }
     hr {
       width: 100%;
