@@ -17,6 +17,7 @@ const props = defineProps({
   selectedPoints: Number,
   pointsOptions: Array,
   totalEggsWithPrice: Number,
+  totalResults: Number,
   loading: Boolean
 })
 
@@ -210,6 +211,7 @@ window.checkEggNumber = async () => {
           :disabled="loading"
         />
       </div>
+      <p>Results: {{ totalResults }}</p>
     </section>
     <p :class="['hint', { visible: isHintVisible }]">{{ hintMessage }}</p>
     <a href="https://x.com/damian_shard" target="_blank" class="sig">

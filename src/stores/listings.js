@@ -19,7 +19,7 @@ export const useListingsStore = defineStore('listings', {
       const cachedTimestamp = localStorage.getItem(LOCAL_STORAGE_TIMESTAMP_KEY);
       const currentTime = new Date().getTime();
 
-      if (cachedListings && cachedListings.length > 0 && cachedTimestamp && (currentTime - cachedTimestamp < 5 * 60 * 1000)) {
+      if (cachedListings && cachedListings.length > 0 && cachedTimestamp && (currentTime - cachedTimestamp < 3 * 60 * 1000)) {
         this.listings = cachedListings;
         return;
       }
@@ -41,7 +41,6 @@ export const useListingsStore = defineStore('listings', {
           allListings = allListings.concat(data.listings);
           nextCursor = data.next_cursor;
         } while (nextCursor);
-        // console.log(allListings)
         allListings = allListings.filter((listing) =>
           listing.nft_details.extra_metadata.attributes[1].value.toLowerCase() === 'offline'
         );
@@ -50,7 +49,6 @@ export const useListingsStore = defineStore('listings', {
         localStorage.setItem(LOCAL_STORAGE_CACHE_KEY, JSON.stringify(allListings));
         localStorage.setItem(LOCAL_STORAGE_TIMESTAMP_KEY, currentTime.toString());
       } catch (error) {
-        console.log(error)
         this.error = error.message;
       } finally {
         this.loading = false;

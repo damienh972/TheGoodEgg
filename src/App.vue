@@ -1,8 +1,9 @@
-<!-- src/App.vue -->
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import { useLBoardStore } from './stores/leaderboard'
+import { useLBoardStore } from '@/stores/leaderboard'
 import { useListingsStore } from '@/stores/listings'
+import { useUnrevealedStore } from '@/stores/unrevealed'
+
 import { EggsFilter, FindEgg, ShowResults } from '@components'
 
 console.log('%cHey there, curious developer!', 'color: green; font-size: 20px;')
@@ -13,6 +14,8 @@ console.log(
 
 const lBoardStore = useLBoardStore()
 const listingsStore = useListingsStore()
+const unrevealedStore = useUnrevealedStore()
+
 const eggId = ref('')
 const dnaTraits = ['Alien', 'Murakami', 'Undead', 'Reptile', 'Angel', 'Demon', 'Robot', 'Human']
 
@@ -34,12 +37,12 @@ const intervalId = ref(null)
 const LAST_UPDATE_KEY = 'listings_timestamp'
 
 const pointsOptions = computed(() => {
-  const uniquePoints = [...new Set(lBoardStore.lBoard.map((egg) => egg.points))]
+  const uniquePoints = [...new Set(unrevealedStore.unrevealed.map((egg) => egg.points))]
   return uniquePoints.filter((point) => !isNaN(point)).sort((a, b) => b - a)
 })
 
 const eggsWithPrice = computed(() => {
-  return lBoardStore.lBoard.map((egg) => {
+  return unrevealedStore.unrevealed.map((egg) => {
     const price = getListingPrice(egg.tokenId)
     return {
       ...egg,
@@ -49,11 +52,15 @@ const eggsWithPrice = computed(() => {
 })
 
 const filteredEgg = computed(() =>
-  lBoardStore.lBoard.find((egg) => egg.tokenId === parseInt(eggId.value))
+  unrevealedStore.unrevealed.find((egg) => egg.tokenId === parseInt(eggId.value))
 )
 
 const totalEggsWithPrice = computed(() => {
   return filteredEggs.value.filter((egg) => egg.price !== null).length
+})
+
+const totalFilteredResults = computed(() => {
+  return filteredEggs.value.length
 })
 
 const getListingPrice = (tokenId) => {
@@ -184,10 +191,12 @@ onMounted(async () => {
   try {
     loadingMessage.value = 'Retrieving incubation datas...'
     await lBoardStore.loadLBoard()
+    loadingMessage.value = 'Retrieving unrevealed datas...'
+    await unrevealedStore.fetchUnrevealed(lBoardStore.lBoard)
     loadingMessage.value = 'Retrieving listings datas...'
-    await listingsStore.fetchListings()
+    await listingsStore.fetchListings(unrevealedStore.unrevealed)
     loadingMessage.value = 'Initializing eggs results...'
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 500))
     applyFilters()
   } catch (error) {
     console.error('Error in onMounted:', error)
@@ -236,13 +245,14 @@ onUnmounted(() => {
         :selected-points="selectedPoints"
         :points-options="pointsOptions"
         :total-eggs-with-price="totalEggsWithPrice"
+        :total-results="totalFilteredResults"
         :loading="loading"
         @update:selectedPoints="selectedPoints = $event"
         @filter-change="handleFilterChange"
       />
     </nav>
     <button @click="refreshPage" :disabled="!refreshEnabled">
-      {{ refreshEnabled ? 'Refresh' : `Refresh in ${300 - timeSinceLastUpdate}s` }}
+      {{ refreshEnabled ? 'Refresh' : `Refresh in ${181 - timeSinceLastUpdate}s` }}
     </button>
   </header>
   <main>
