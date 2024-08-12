@@ -4,6 +4,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import VueLazyload from 'vue-lazyload';
 import VueSelect from "vue-select";
+import router from './router'
 import App from './App.vue'
 import loadingImage from '@assets/images/avatar1.jpg'
 import errorImage from '@assets/images/avatar1.jpg'
@@ -18,5 +19,6 @@ app.use(VueLazyload, {
 });
 
 app.use(createPinia())
+app.use(router)
 app.component("v-select", VueSelect)
 app.mount('#app')

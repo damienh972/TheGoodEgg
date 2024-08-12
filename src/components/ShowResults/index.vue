@@ -27,8 +27,12 @@ const roundUpToTwoDecimals = (num) => {
 }
 
 const initializeDisplayedLBoard = () => {
-  displayedLBoard.value = props.filteredEggs.slice(0, itemsPerPage)
-  currentPage.value = 2
+  if (props.filteredEggs && props.filteredEggs.length > 0) {
+    displayedLBoard.value = props.filteredEggs.slice(0, itemsPerPage)
+    currentPage.value = 2
+  } else {
+    displayedLBoard.value = []
+  }
 }
 
 watch(
@@ -49,11 +53,13 @@ const loadMore = async () => {
   if (!loadingScroll.value) {
     loadingScroll.value = true
     try {
-      const start = (currentPage.value - 1) * itemsPerPage
-      const end = currentPage.value * itemsPerPage
-      const newItems = props.filteredEggs.slice(start, end)
-      displayedLBoard.value.push(...newItems)
-      currentPage.value += 1
+      if (props.filteredEggs && props.filteredEggs.length > 0) {
+        const start = (currentPage.value - 1) * itemsPerPage
+        const end = currentPage.value * itemsPerPage
+        const newItems = props.filteredEggs.slice(start, end)
+        displayedLBoard.value.push(...newItems)
+        currentPage.value += 1
+      }
     } catch (err) {
       error.value = err.message
     } finally {
@@ -80,15 +86,19 @@ const attachScrollListener = async () => {
 
 onMounted(async () => {
   try {
-    await initializeDisplayedLBoard()
+    if (props.filteredEggs && props.filteredEggs.length > 0) {
+      await initializeDisplayedLBoard()
+    }
     await attachScrollListener()
   } catch (error) {
     console.error('Error in onMounted:', error)
   }
 })
+
+console.log(displayedLBoard);
 </script>
 <template>
-  <section v-if="filteredEggs.length > 0 && !loading" class="results">
+  <section v-if="filteredEggs && filteredEggs.length > 0 && !loading" class="results">
     <ul class="infinite-scroll" ref="scrollContainer">
       <div v-for="(item, index) in displayedLBoard" class="egg-entry" :key="index">
         <li class="egg-entry__title">

@@ -1,33 +1,92 @@
-// src/store/unrevealed.js
+// src/store/index.js
 import { defineStore } from 'pinia';
-import { GET_BURNED } from '../subgraph';
-
-const LOCAL_STORAGE_CACHE_KEY = 'leaderboard_cache';
-const LOCAL_STORAGE_TIMESTAMP_KEY = 'listings_timestamp';
+import { fetchBurnedIds, updateBurnedIds, fetchUnrevealedIds, updateUnrevealedIds } from '@/api';
+import { GET_BURNED } from '@/subgraph';
 
 export const useUnrevealedStore = defineStore('unrevealed', {
   state: () => ({
+    burned: [],
     unrevealed: [],
-    count: null,
     loading: false,
     error: null,
   }),
   actions: {
-    async fetchUnrevealed(leaderboard) {
-      const cachedUnrevealed = JSON.parse(localStorage.getItem(LOCAL_STORAGE_CACHE_KEY));
-      const cachedTimestamp = localStorage.getItem(LOCAL_STORAGE_TIMESTAMP_KEY);
-      const currentTime = new Date().getTime();
 
-      if (cachedUnrevealed && cachedUnrevealed.length > 0 && cachedTimestamp && (currentTime - cachedTimestamp < 3 * 60 * 1000)) {
-        this.unrevealed = cachedUnrevealed;
-        return;
-      }
+    // async populateDatabaseWithSubgraphData(leaderboard) {
+    //   this.loading = true;
+    //   this.error = null;
 
+    //   try {
+    //     const tokenIds = leaderboard.map(egg => Number(egg.tokenId));
+    //     const response = await fetch("https://subgraph.satsuma-prod.com/eaa3f9356941/damien-test--19534/thegoodegg/api", {
+    //       method: 'POST',
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //       },
+    //       body: JSON.stringify({
+    //         query: GET_BURNED,
+    //         variables: { tokenIds }
+    //       })
+    //     });
+    //     const responseData = await response.json();
+    //     const burnedData = responseData.data.transfers.map((item, index) => ({
+    //       ...item,
+    //       index
+    //     }));
+
+    //     const burnedIds = burnedData.map(item => Number(item.tokenId));
+    //     const unrevealedData = tokenIds.filter(id => !burnedIds.includes(id));
+
+    //     this.burned = burnedData;
+    //     this.unrevealed = unrevealedData;
+    //     await updateBurnedIds(burnedData, unrevealedData)
+    //     console.log("successfully registered in database");
+    //   } catch (error) {
+    //     this.error = error.message;
+    //     console.error('Error populating the Database:', error);
+    //   } finally {
+    //     this.loading = false;
+    //   }
+    // },
+    async loadBurned(leaderboard) {
       this.loading = true;
       this.error = null;
 
       try {
-        const tokenIds = leaderboard.map(egg => egg.tokenId);
+        const data = await fetchBurnedIds();
+        this.burned = leaderboard.filter((egg) => data.includes(egg.tokenId));
+      } catch (error) {
+        console.log(error);
+        this.error = error.message;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async loadUnrevealed(leaderboard) {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        const data = await fetchUnrevealedIds();
+        const eggData = leaderboard.filter((egg) => data.includes(egg.tokenId));
+        this.unrevealed = eggData;
+        console.log("unrevealed", eggData)
+      } catch (error) {
+        console.log(error);
+        this.error = error.message;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async updateBurnedAndUnrevealed(leaderboard) {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        const tokenIds = leaderboard.map(egg => Number(egg.tokenId));
+
         const response = await fetch("https://subgraph.satsuma-prod.com/eaa3f9356941/damien-test--19534/thegoodegg/api", {
           method: 'POST',
           headers: {
@@ -40,16 +99,29 @@ export const useUnrevealedStore = defineStore('unrevealed', {
         });
         const responseData = await response.json();
 
-        const burnedTokenIds = responseData.data.transfers.map(transfer => transfer.tokenId.toString());
-        const unrevealed = leaderboard.filter(egg => !burnedTokenIds.includes(egg.tokenId.toString()));
-        this.unrevealed = unrevealed;
+        const burnedIds = responseData.data.transfers.map(item => Number(item.tokenId));
+        const newBurnedIds = burnedIds.filter(id => !this.burned.includes(id));
 
-        localStorage.setItem(LOCAL_STORAGE_CACHE_KEY, JSON.stringify(unrevealed));
+        if (newBurnedIds.length > 0) {
+          await updateBurnedIds(newBurnedIds, []);
+
+          const newBurned = leaderboard.filter((egg) => {
+            newBurnedIds.includes(egg.tokenId);
+          });
+          this.burned = [...this.burned, ...newBurned];
+
+          await updateUnrevealedIds([], newBurnedIds);
+
+          this.unrevealed = this.unrevealed.filter(
+            egg => !newBurnedIds.includes(egg.tokenId)
+          );
+        }
       } catch (error) {
+        console.log(error);
         this.error = error.message;
       } finally {
         this.loading = false;
       }
-    },
+    }
   },
 });

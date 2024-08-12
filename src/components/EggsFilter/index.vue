@@ -211,7 +211,7 @@ window.checkEggNumber = async () => {
           :disabled="loading"
         />
       </div>
-      <p>Results: {{ totalResults }}</p>
+      <p>Results: {{ totalResults }} /10004</p>
     </section>
     <p :class="['hint', { visible: isHintVisible }]">{{ hintMessage }}</p>
     <a href="https://x.com/damian_shard" target="_blank" class="sig">
