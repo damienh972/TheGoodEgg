@@ -11,8 +11,7 @@ const routes = [
   {
     path: '/stats',
     name: 'Stats',
-    component: AnimusStats,
-    props: route => ({ data: route.params.data })
+    component: AnimusStats
   }
 ]
 

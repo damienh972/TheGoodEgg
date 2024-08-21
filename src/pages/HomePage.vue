@@ -193,12 +193,11 @@ onMounted(async () => {
     await lBoardStore.loadLBoard()
     loadingMessage.value = 'Retrieving burned eggs...'
     await unrevealedStore.loadBurned(lBoardStore.lBoard)
-    console.log(unrevealedStore.burned);
     loadingMessage.value = 'Retrieving unrevealed eggs...'
     await unrevealedStore.loadUnrevealed(lBoardStore.lBoard)
-    console.log(unrevealedStore.unrevealed);
     loadingMessage.value = 'Retrieving listings datas...'
-    await listingsStore.fetchListings(unrevealedStore.unrevealed)
+    await listingsStore.fetchListings()
+
     loadingMessage.value = 'Check for new reveal...'
     await unrevealedStore.updateBurnedAndUnrevealed(lBoardStore.lBoard);
     loadingMessage.value = 'Initializing eggs results...'

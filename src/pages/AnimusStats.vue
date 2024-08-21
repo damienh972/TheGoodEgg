@@ -1,60 +1,263 @@
 <script setup>
-import { onBeforeMount } from 'vue'
+import { onBeforeMount, onMounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { EggsFilter, FindEgg, ShowResults } from '@components'
+import { AnimusResults, AnimusFilter, FindAnimus } from '@/components'
+import { useLBoardStore } from '@/stores/leaderboard'
 import { useUnrevealedStore } from '@/stores/unrevealed'
+import { useAnimusStore } from '@/stores/animus'
 
 const router = useRouter()
+const lBoardStore = useLBoardStore()
 const unrevealedStore = useUnrevealedStore()
-const { burned, unrevealed } = unrevealedStore
+const animusStore = useAnimusStore()
+const { lBoard } = lBoardStore
+const { burned } = unrevealedStore
+
+const animusId = ref('')
+const loading = ref(false)
+const loadingMessage = ref('Loading ...')
+
 onBeforeMount(() => {
   if (burned.length === 0) {
     router.push('/')
   }
 })
-console.log('burned', burned)
-console.log('unrevealed', unrevealed)
+
+onMounted(async () => {
+  loading.value = true
+  try {
+
+    await animusStore.getAnimus(burned.length)
+    await enrichAnimusWithBurnedData()
+    await animusStore.refreshAnimus(burned, animusStore.animus)
+  } catch (error) {
+    console.error('Error in onMounted:', error)
+    error.value = error
+  } finally {
+    loading.value = false
+  }
+})
+
+const animus = computed(() =>
+  burned.find((animus) => animus.tokenId === parseInt(animusId.value))
+)
+
+const enrichAnimusWithBurnedData = async () => {
+  // Créer un objet de correspondance pour accéder rapidement aux burned eggs
+  const burnedLookup = burned.reduce((acc, egg) => {
+    acc[egg.tokenId.toString()] = egg
+    return acc
+  }, {})
+
+  // Utiliser le lookup object pour enrichir les animus
+  const enrichedAnimus = animusStore.animus.map((animus) => {
+    const correspondingBurnedEgg = burnedLookup[animus.tokenId]
+
+    return {
+      ...animus,
+      points: correspondingBurnedEgg ? Number(correspondingBurnedEgg.points) : null,
+      hasMurakamiDrip: correspondingBurnedEgg
+        ? correspondingBurnedEgg.bonusTraits.includes('Murakami Drip')
+        : false
+    }
+  })
+
+  animusStore.animus = enrichedAnimus
+}
+
+const filters = ref({
+  species: '',
+  aura: '',
+  generation: '',
+  element: '',
+  mkBoost: false
+})
+
+const species = computed(() => {
+  return [...new Set(animusStore.animus.map((animus) => animus.species))]
+})
+
+const aura = ref(['Legendary', 'Epic', 'Rare', 'Uncommon'])
+const generations = ref(['1', '2', '3'])
+const elements = ref([
+  'TM Animus',
+  'Electro',
+  'Plant',
+  'Water',
+  'Earth',
+  'Fire',
+  'Shadow',
+  'TM Drip',
+  'Light',
+  'Cosmic',
+  'Magic'
+])
+
+// Filtrer les animus en fonction des filtres
+const filteredAnimus = computed(() => {
+  return animusStore.animus.filter((animus) => {
+    const matchesMkBoost = !filters.value.mkBoost || animus.hasMurakamiDrip
+    return (
+      (!filters.value.species || animus.species === filters.value.species) &&
+      (!filters.value.aura || animus.aura === filters.value.aura) &&
+      (!filters.value.generation || animus.generation === filters.value.generation) &&
+      (!filters.value.element || animus.element === filters.value.element) &&
+      matchesMkBoost
+    )
+  })
+})
+
+// Calculer les pourcentages pour chaque fourchette de points
+const calculatePercentages = () => {
+  const pointRanges = [
+    { min: 0, max: 30 },
+    { min: 31, max: 60 },
+    { min: 61, max: 90 },
+    { min: 91, max: 120 },
+    { min: 121, max: 150 },
+    { min: 151, max: 180 },
+    { min: 181, max: 210 },
+    { min: 211, max: 240 },
+    { min: 241, max: 270 },
+    { min: 271, max: 300 }
+  ]
+
+  return pointRanges.map((range) => {
+    const totalEggsInRange = lBoard.filter((egg) => {
+      const eggPoints = Number(egg.points)
+      const isInRange = eggPoints >= range.min && eggPoints <= range.max
+      const isMurakami = egg.bonusTraits.includes('Murakami Drip')
+
+      // Filtrer en fonction de mkBoost
+      if (filters.value.mkBoost) {
+        return isInRange && isMurakami
+      } else {
+        return isInRange && !isMurakami
+      }
+    }).length
+
+    const eggsInRange = filteredAnimus.value.filter((animus) => {
+      const isInRange = animus.points >= range.min && animus.points <= range.max
+
+      // Filtrer en fonction de mkBoost
+      if (filters.value.mkBoost) {
+        return isInRange && animus.hasMurakamiDrip
+      } else {
+        return isInRange && !animus.hasMurakamiDrip
+      }
+    })
+
+    const percentage = totalEggsInRange > 0 ? (eggsInRange.length / totalEggsInRange) * 100 : 0
+
+    return {
+      range: `${range.min}-${range.max}`,
+      percentage: percentage.toFixed(2),
+      count: eggsInRange.length,
+      total: totalEggsInRange
+    }
+  })
+}
+
+// Calculer les probabilités de révélation pour chaque fourchette de points en fonction des filtres
+const calculateProbabilities = () => {
+  const pointRanges = [
+    { min: 0, max: 30 },
+    { min: 31, max: 60 },
+    { min: 61, max: 90 },
+    { min: 91, max: 120 },
+    { min: 121, max: 150 },
+    { min: 151, max: 180 },
+    { min: 181, max: 210 },
+    { min: 211, max: 240 },
+    { min: 241, max: 270 },
+    { min: 271, max: 300 }
+  ]
+
+  // Calculer les probabilités brutes pour chaque tranche de points
+  const rawProbabilities = pointRanges.map((range) => {
+    const totalEggsInRange = lBoard.filter((egg) => {
+      const eggPoints = Number(egg.points)
+      const isInRange = eggPoints >= range.min && eggPoints <= range.max
+      const isMurakami = egg.bonusTraits.includes('Murakami Drip')
+
+      // Filtrer en fonction de mkBoost
+      if (filters.value.mkBoost) {
+        return isInRange && isMurakami
+      } else {
+        return isInRange && !isMurakami
+      }
+    }).length
+
+    const filteredEggsInRange = filteredAnimus.value.filter((animus) => {
+      const isInRange = animus.points >= range.min && animus.points <= range.max
+
+      // Filtrer en fonction de mkBoost
+      if (filters.value.mkBoost) {
+        return isInRange && animus.hasMurakamiDrip
+      } else {
+        return isInRange && !animus.hasMurakamiDrip
+      }
+    })
+
+    const probability =
+      totalEggsInRange > 0 && filteredEggsInRange.length > 0
+        ? filteredEggsInRange.length / totalEggsInRange
+        : 0
+
+    return {
+      range: `${range.min}-${range.max}`,
+      probability, // Probabilité brute non normalisée
+      count: filteredEggsInRange.length,
+      total: totalEggsInRange
+    }
+  })
+
+  // Calculer la somme totale des probabilités brutes
+  const totalProbability = rawProbabilities.reduce((sum, item) => sum + item.probability, 0)
+
+  // Normaliser les probabilités pour que la somme totale fasse 100%
+  return rawProbabilities.map((item) => {
+    const normalizedProbability =
+      totalProbability > 0 ? (item.probability / totalProbability) * 100 : 0
+
+    return {
+      range: item.range,
+      percentage: normalizedProbability.toFixed(2),
+      count: item.count,
+      total: item.total
+    }
+  })
+}
+
+const percentages = computed(() => calculatePercentages())
+const probabilities = computed(() => calculateProbabilities())
+
+const applyFilters = (newFilters) => {
+  filters.value = newFilters
+  console.log('Filtered Animus:', filteredAnimus.value)
+}
+
 </script>
 
 <template>
   <header>
     <h1>TheGoodAnimus</h1>
     <router-link class="link" to="/">Go to Eggs</router-link>
-    <nav>
-      <FindEgg
-        :egg-id="parseInt(eggId)"
-        :get-trait-image="getTraitImage"
-        :filtered-egg="filteredEgg"
-        :get-clone-id="getCloneId"
-        @update:eggId="eggId = $event"
-      />
-      <EggsFilter
-        :dna-traits="dnaTraits"
-        :boost-traits="boostTraits"
-        :selected-dna-trait="selectedDnaTrait"
-        :selected-boost-traits="selectedBoostTraits"
-        :select-dna-trait="selectDnaTrait"
-        :select-boost-trait="selectBoostTrait"
-        :get-trait-image="getTraitImage"
-        :selected-points="selectedPoints"
-        :points-options="pointsOptions"
-        :total-eggs-with-price="totalEggsWithPrice"
-        :total-results="totalFilteredResults"
-        :loading="loading"
-        @update:selectedPoints="selectedPoints = $event"
-        @filter-change="handleFilterChange"
-      />
-    </nav>
-    <button @click="refreshPage" :disabled="!refreshEnabled">
-      {{ refreshEnabled ? 'Refresh' : `Refresh in ${181 - timeSinceLastUpdate}s` }}
-    </button>
-  </header>
-  <main>
-    <ShowResults
-      :filtered-eggs="burned"
-      :get-trait-image="getTraitImage"
-      :get-clone-id="getCloneId"
-      :loading="loading"
+      <FindAnimus
+      :burned-eggs="burned"
+      :filtered-animus="animus"
+      @update:animusId="animusId = $event"
     />
+  </header>
+
+  <main>
+    <AnimusFilter
+      :species="species"
+      :aura="aura"
+      :generations="generations"
+      :elements="elements"
+      @filter-change="applyFilters"
+    />
+    <AnimusResults :percentages="percentages" :probabilities="probabilities" :filters="filters" :loading="loading"/>
   </main>
 </template>

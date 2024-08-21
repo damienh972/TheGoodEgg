@@ -1,0 +1,25 @@
+.find-animus {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0;
+  padding-bottom: 0;
+  background-color:  black;
+  color: #fed712;
+}
+
+.find-animus input {
+  padding: 0.5rem;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+}
+
+.find-animus ul {
+  max-width: 600px;
+  width: 100%;
+}
+
+.find-animus p {
+  margin: auto;
+  font-size: 24px;
+}

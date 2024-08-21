@@ -1,6 +1,7 @@
 // src/store/listings.js
 import { defineStore } from 'pinia';
 
+const LOCAL_STORAGE_CACHE_KEY = 'listings_cache';
 const LOCAL_STORAGE_TIMESTAMP_KEY = 'listings_timestamp';
 const API_KEY = import.meta.env.VITE_SIMPLEHASH_API_KEY;
 const COLLECTION_ID = import.meta.env.VITE_COLLECTION_ID;
@@ -13,12 +14,21 @@ export const useListingsStore = defineStore('listings', {
     error: null,
   }),
   actions: {
+
+    chunkArray(array, chunkSize) {
+    const chunks = [];
+    for(let i = 0; i<array.length; i += chunkSize) {
+      chunks.push(array.slice(i, i + chunkSize));
+    }
+    return chunks;
+    },
     async fetchListings() {
+      const cachedListings = JSON.parse(localStorage.getItem(LOCAL_STORAGE_CACHE_KEY));
       const cachedTimestamp = localStorage.getItem(LOCAL_STORAGE_TIMESTAMP_KEY);
       const currentTime = new Date().getTime();
 
-      if (this.listings && cachedTimestamp && (currentTime - cachedTimestamp < 3 * 60 * 1000)) {
-        return this.listings;
+      if (cachedListings && cachedListings.length > 0 && cachedTimestamp && (currentTime - cachedTimestamp < 3 * 60 * 1000)) {
+        return this.listings = cachedListings;
       }
 
       this.loading = true;
@@ -38,13 +48,11 @@ export const useListingsStore = defineStore('listings', {
           allListings = allListings.concat(data.listings);
           nextCursor = data.next_cursor;
         } while (nextCursor);
-        allListings = allListings.filter((listing) =>
-          listing.nft_details.extra_metadata.attributes[1].value.toLowerCase() === 'offline'
-        );
-        this.listings = allListings
-        console.log("all listings", allListings)
+        this.listings + allListings;
+        localStorage.setItem(LOCAL_STORAGE_CACHE_KEY, JSON.stringify(allListings));
         localStorage.setItem(LOCAL_STORAGE_TIMESTAMP_KEY, currentTime.toString());
       } catch (error) {
+        console.log(error);
         this.error = error.message;
       } finally {
         this.loading = false;

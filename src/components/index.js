@@ -1,3 +1,6 @@
 export { default as EggsFilter } from './EggsFilter/index.vue'
 export { default as FindEgg } from './FindEgg/index.vue'
 export { default as ShowResults } from './ShowResults/index.vue'
+export { default as AnimusFilter } from './AnimusFilter/index.vue'
+export { default as FindAnimus } from './FindAnimus/index.vue'
+export { default as AnimusResults } from './AnimusResults/index.vue'

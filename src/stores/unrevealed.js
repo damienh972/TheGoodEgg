@@ -71,7 +71,6 @@ export const useUnrevealedStore = defineStore('unrevealed', {
         const data = await fetchUnrevealedIds();
         const eggData = leaderboard.filter((egg) => data.includes(egg.tokenId));
         this.unrevealed = eggData;
-        console.log("unrevealed", eggData)
       } catch (error) {
         console.log(error);
         this.error = error.message;
@@ -100,7 +99,8 @@ export const useUnrevealedStore = defineStore('unrevealed', {
         const responseData = await response.json();
 
         const burnedIds = responseData.data.transfers.map(item => Number(item.tokenId));
-        const newBurnedIds = burnedIds.filter(id => !this.burned.includes(id));
+        const databaseBurnedIds = this.burned.map((egg) => Number(egg.tokenId))
+        const newBurnedIds = burnedIds.filter(id => !databaseBurnedIds.includes(id));
 
         if (newBurnedIds.length > 0) {
           await updateBurnedIds(newBurnedIds, []);

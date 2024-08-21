@@ -1,0 +1,122 @@
+@import 'vue-select/dist/vue-select.css';
+
+.burger-menu {
+  width: 100%;
+  height: 40px;
+  background-color: black;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  cursor: pointer;
+
+  span {
+    display: block;
+    width: 20px;
+    height: 3px;
+    background-color: #fed712;
+    margin: 5px 10px;
+    transition: all 0.3s;
+  }
+}
+
+.burger-menu .burger-open {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 20px;
+  z-index: 4;
+}
+
+.burger-menu .burger-open.burger-open span:nth-child(1) {
+  transform: rotate(45deg) translate(10px, 10px);
+}
+
+.burger-menu .burger-open.burger-open span:nth-child(2) {
+  opacity: 0;
+}
+
+.burger-menu .burger-open.burger-open span:nth-child(3) {
+  transform: rotate(-45deg) translate(8px, -8px);
+}
+
+.animus-filter {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+  overflow-y: auto;
+  background-color: black;
+  color: white;
+  padding: 10px 0;
+  scrollbar-width: thin;
+
+  .animus-filter__box {
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80px;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+}
+
+.animus-filter--open {
+  transform: translateY(0);
+  z-index: 1;
+}
+
+.animus-filter__traits {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+
+  h2 {
+    width: 100%;
+    font-weight: normal;
+  }
+}
+
+.animus-filter__traits select {
+  padding: 5px;
+  background-color: black;
+  color: white;
+  border: 1px solid #fed712;
+  border-radius: 4px;
+}
+
+@media only screen and (min-width: 769px) {
+  .burger-menu {
+    display: none;
+  }
+
+  .animus-filter {
+    position: fixed;
+    width: 20%;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    transform: none;
+
+    h2 {
+      padding: 20px 0;
+    }
+
+    .animus-filter__points {
+      padding-top: 40px;
+    }
+  }
+}
