@@ -48,7 +48,7 @@ export const useListingsStore = defineStore('listings', {
           allListings = allListings.concat(data.listings);
           nextCursor = data.next_cursor;
         } while (nextCursor);
-        this.listings + allListings;
+        this.listings = allListings;
         localStorage.setItem(LOCAL_STORAGE_CACHE_KEY, JSON.stringify(allListings));
         localStorage.setItem(LOCAL_STORAGE_TIMESTAMP_KEY, currentTime.toString());
       } catch (error) {

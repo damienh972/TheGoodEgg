@@ -2,9 +2,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 15px;
   padding: 1rem 0;
   padding-bottom: 0;
-  background-color:  black;
+  background-color: black;
   color: #fed712;
 }
 
@@ -22,4 +23,9 @@
 .find-animus p {
   margin: auto;
   font-size: 24px;
+}
+
+.clone-pfp {
+  width: 100px;
+  margin-bottom: 10px;
 }

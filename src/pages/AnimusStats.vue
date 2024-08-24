@@ -26,7 +26,6 @@ onBeforeMount(() => {
 onMounted(async () => {
   loading.value = true
   try {
-
     await animusStore.getAnimus(burned.length)
     await enrichAnimusWithBurnedData()
     await animusStore.refreshAnimus(burned, animusStore.animus)
@@ -38,9 +37,7 @@ onMounted(async () => {
   }
 })
 
-const animus = computed(() =>
-  burned.find((animus) => animus.tokenId === parseInt(animusId.value))
-)
+const animus = computed(() => burned.find((animus) => animus.tokenId === parseInt(animusId.value)))
 
 const enrichAnimusWithBurnedData = async () => {
   // Créer un objet de correspondance pour accéder rapidement aux burned eggs
@@ -234,16 +231,26 @@ const probabilities = computed(() => calculateProbabilities())
 
 const applyFilters = (newFilters) => {
   filters.value = newFilters
-  console.log('Filtered Animus:', filteredAnimus.value)
 }
 
+const getTraitImage = (color, trait) => {
+  if (trait === 'Artist Edition') {
+    return `/assets/images/rtfkt_bonus_${color}/ae.svg`
+  }
+  if (trait === 'Murakami Drip') {
+    return `/assets/images/rtfkt_bonus_${color}/mkd.svg`
+  }
+
+  return `/assets/images/rtfkt_bonus_${color}/${trait.toLowerCase()}.svg`
+}
 </script>
 
 <template>
   <header>
     <h1>TheGoodAnimus</h1>
     <router-link class="link" to="/">Go to Eggs</router-link>
-      <FindAnimus
+    <FindAnimus
+      :get-trait-image="getTraitImage"
       :burned-eggs="burned"
       :filtered-animus="animus"
       @update:animusId="animusId = $event"
@@ -258,6 +265,11 @@ const applyFilters = (newFilters) => {
       :elements="elements"
       @filter-change="applyFilters"
     />
-    <AnimusResults :percentages="percentages" :probabilities="probabilities" :filters="filters" :loading="loading"/>
+    <AnimusResults
+      :percentages="percentages"
+      :probabilities="probabilities"
+      :filters="filters"
+      :loading="loading"
+    />
   </main>
 </template>

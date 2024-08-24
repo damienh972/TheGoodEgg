@@ -4,6 +4,7 @@ import { ref, watch } from 'vue'
 import './findanimus.scss'
 
 const props = defineProps({
+  getTraitImage: Function,
   animusId: [Number, String],
   burnedEggs: Array,
   filteredAnimus: Object
@@ -32,22 +33,45 @@ const getPoints = (tokenId) => {
 
 const getBonusTokenId = (tokenId) => {
   const egg = props.burnedEggs.find((egg) => egg.tokenId.toString() === tokenId.toString())
-  const bonus = egg?.bonusesItems?.find((bonusItem) => bonusItem.bonusContractAddress === '0x49cf6f5d44e70224e2e23fdcdd2c053f30ada28b')
+  const bonus = egg?.bonusesItems?.find(
+    (bonusItem) => bonusItem.bonusContractAddress === '0x49cf6f5d44e70224e2e23fdcdd2c053f30ada28b'
+  )
   return bonus ? bonus.bonusTokenId : 'N/A'
 }
-console.log("filtered animus", props.filteredAnimus)
 </script>
 
 <template>
   <section class="find-animus">
-    <label>Find animus by id</label>
-    <input type="number" v-model="internalAnimusId" placeholder="Enter Animus ID" @input="updateAnimusId" />
+    <label>Find animus origins by id</label>
+    <input
+      type="number"
+      v-model="internalAnimusId"
+      placeholder="Enter Animus ID"
+      @input="updateAnimusId"
+    />
     <ul v-if="filteredAnimus">
       <li>
+        <img
+          class="clone-pfp"
+          :src="`https://animus-assets.rtfkt.com/images/${internalAnimusId}.png`"
+          alt="animus"
+        />
+
         <p>{{ getPoints(filteredAnimus.tokenId) }} pts</p>
-        <p>Bonus Token ID: {{ getBonusTokenId(filteredAnimus.tokenId) }}</p>
+        <a
+          :href="`https://magiceden.io/item-details/ethereum/0x49cf6f5d44e70224e2e23fdcdd2c053f30ada28b/${getBonusTokenId(filteredAnimus.tokenId)}`"
+          target="blank"
+        >
+          <img
+            class="clone-pfp"
+            v-lazy="
+              `https://clonex-assets.rtfkt.com/images/${getBonusTokenId(filteredAnimus.tokenId)}.png`
+            "
+            alt="clone pfp"
+          />
+        </a>
       </li>
     </ul>
-    <p v-if="!filteredAnimus && internalAnimusId">ID not found</p>
+    <p v-if="!filteredAnimus && internalAnimusId">Not found</p>
   </section>
 </template>

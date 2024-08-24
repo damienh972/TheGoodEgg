@@ -7,7 +7,7 @@ const props = defineProps({
   species: Array,
   aura: Array,
   generations: Array,
-  elements: Array,
+  elements: Array
 })
 
 const emit = defineEmits(['filter-change'])
@@ -24,7 +24,7 @@ const applyFilters = () => {
     aura: selectedAura.value,
     generation: selectedGeneration.value,
     element: selectedElement.value,
-    mkBoost: selectedMkBoost.value,
+    mkBoost: selectedMkBoost.value
   })
 }
 
@@ -32,7 +32,6 @@ const isMenuOpen = ref(false)
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value
 }
-
 </script>
 
 <template>
@@ -44,45 +43,61 @@ const toggleMenu = () => {
     </div>
   </div>
   <section :class="['animus-filter', { 'animus-filter--open': isMenuOpen }]">
-    <p>Search by :</p>
-
+    <p>Filter by :</p>
+<div class="animus-filter__container">
     <div class="animus-filter__traits">
       <h2>Species</h2>
       <div class="animus-filter__box">
-        <select v-model="selectedSpecies" @change="applyFilters">
-          <option value="">All</option>
-          <option v-for="trait in species" :key="trait" :value="trait">{{ trait }}</option>
-        </select>
+        <v-select
+          class="species"
+          :options="species"
+          v-model="selectedSpecies"
+          @update:modelValue="applyFilters"
+          :reduce="(trait) => trait"
+          label="Species"
+        />
       </div>
     </div>
 
     <div class="animus-filter__traits">
       <h2>Aura</h2>
       <div class="animus-filter__box">
-        <select v-model="selectedAura" @change="applyFilters">
-          <option value="">All</option>
-          <option v-for="trait in aura" :key="trait" :value="trait">{{ trait }}</option>
-        </select>
+        <v-select
+          class="aura"
+          :options="aura"
+          v-model="selectedAura"
+          @update:modelValue="applyFilters"
+          :reduce="(trait) => trait"
+          label="Aura"
+        />
       </div>
     </div>
 
     <div class="animus-filter__traits">
       <h2>Generation</h2>
       <div class="animus-filter__box">
-        <select v-model="selectedGeneration" @change="applyFilters">
-          <option value="">All</option>
-          <option v-for="generation in generations" :key="generation" :value="generation">{{ generation }}</option>
-        </select>
+        <v-select
+          class="generation"
+          :options="generations"
+          v-model="selectedGeneration"
+          @update:modelValue="applyFilters"
+          :reduce="(generation) => generation"
+          label="Generation"
+        />
       </div>
     </div>
 
     <div class="animus-filter__traits">
       <h2>Element</h2>
       <div class="animus-filter__box">
-        <select v-model="selectedElement" @change="applyFilters">
-          <option value="">All</option>
-          <option v-for="element in elements" :key="element" :value="element">{{ element }}</option>
-        </select>
+        <v-select
+          class="element"
+          :options="elements"
+          v-model="selectedElement"
+          @update:modelValue="applyFilters"
+          :reduce="(element) => element"
+          label="Element"
+        />
       </div>
     </div>
 
@@ -92,5 +107,10 @@ const toggleMenu = () => {
         <input type="checkbox" v-model="selectedMkBoost" @change="applyFilters" />
       </div>
     </div>
+    </div>
+     <a href="https://x.com/damian_shard" target="_blank" class="sig">
+    <p>Made with ❤️ by</p>
+    <img src="/assets/images/clone_436.png" />
+  </a>
   </section>
 </template>

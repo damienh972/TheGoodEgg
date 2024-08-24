@@ -11,7 +11,6 @@ console.log(
   'color: blue; font-size: 16px;'
 )
 
-
 const lBoardStore = useLBoardStore()
 const listingsStore = useListingsStore()
 const unrevealedStore = useUnrevealedStore()
@@ -197,9 +196,8 @@ onMounted(async () => {
     await unrevealedStore.loadUnrevealed(lBoardStore.lBoard)
     loadingMessage.value = 'Retrieving listings datas...'
     await listingsStore.fetchListings()
-
     loadingMessage.value = 'Check for new reveal...'
-    await unrevealedStore.updateBurnedAndUnrevealed(lBoardStore.lBoard);
+    await unrevealedStore.updateBurnedAndUnrevealed(lBoardStore.lBoard)
     loadingMessage.value = 'Initializing eggs results...'
     await new Promise((resolve) => setTimeout(resolve, 200))
     applyFilters()

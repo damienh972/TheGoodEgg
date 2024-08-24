@@ -58,15 +58,38 @@
   scrollbar-width: thin;
 
   .animus-filter__box {
-    height: 80px;
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 80px;
+    min-width: 120px;
     cursor: pointer;
     transition: all 0.4s ease;
-    &:hover {
-      transform: scale(1.1);
+
+    .v-select {
+      width: 100%;
+      .vs__dropdown-toggle {
+        border: 2px solid #fed712 !important;
+      }
+      .vs__option:hover {
+        background-color: #fed712 !important;
+        color: black !important;
+      }
+      .vs__selected,
+      .vs__search::placeholder,
+      .vs__dropdown-toggle,
+      .vs__dropdown-menu {
+        background: black;
+        border: none;
+        color: #fed712;
+        border: 2px solid #fed712;
+        text-transform: lowercase;
+        font-variant: small-caps;
+        min-width: 120px;
+      }
+      .vs__clear,
+      .vs__open-indicator {
+        fill: #fed712;
+      }
     }
   }
 }
@@ -77,9 +100,9 @@
 }
 
 .animus-filter__traits {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-evenly;
+  width: 80%;
+  max-width: 500px;
+  margin: 10px auto;
 
   h2 {
     width: 100%;
@@ -87,12 +110,26 @@
   }
 }
 
-.animus-filter__traits select {
-  padding: 5px;
-  background-color: black;
-  color: white;
-  border: 1px solid #fed712;
-  border-radius: 4px;
+.sig {
+  margin: 20px auto 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 90px;
+  font-size: 10px;
+  transition: all 0.4s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  p {
+    margin: 0 auto;
+  }
+  img {
+    width: 50px;
+  }
 }
 
 @media only screen and (min-width: 769px) {

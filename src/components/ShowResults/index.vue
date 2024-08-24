@@ -94,8 +94,6 @@ onMounted(async () => {
     console.error('Error in onMounted:', error)
   }
 })
-
-console.log(displayedLBoard);
 </script>
 <template>
   <section v-if="filteredEggs && filteredEggs.length > 0 && !loading" class="results">
