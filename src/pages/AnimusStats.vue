@@ -26,8 +26,11 @@ onBeforeMount(() => {
 onMounted(async () => {
   loading.value = true
   try {
+    loadingMessage.value = 'Retrieving all animus...'
     await animusStore.getAnimus(burned.length)
+    loadingMessage.value = 'Generate animus stats...'
     await enrichAnimusWithBurnedData()
+    loadingMessage.value = 'Update animus database...'
     await animusStore.refreshAnimus(burned, animusStore.animus)
   } catch (error) {
     console.error('Error in onMounted:', error)
@@ -40,13 +43,11 @@ onMounted(async () => {
 const animus = computed(() => burned.find((animus) => animus.tokenId === parseInt(animusId.value)))
 
 const enrichAnimusWithBurnedData = async () => {
-  // Créer un objet de correspondance pour accéder rapidement aux burned eggs
   const burnedLookup = burned.reduce((acc, egg) => {
     acc[egg.tokenId.toString()] = egg
     return acc
   }, {})
 
-  // Utiliser le lookup object pour enrichir les animus
   const enrichedAnimus = animusStore.animus.map((animus) => {
     const correspondingBurnedEgg = burnedLookup[animus.tokenId]
 
@@ -90,7 +91,6 @@ const elements = ref([
   'Magic'
 ])
 
-// Filtrer les animus en fonction des filtres
 const filteredAnimus = computed(() => {
   return animusStore.animus.filter((animus) => {
     const matchesMkBoost = !filters.value.mkBoost || animus.hasMurakamiDrip
@@ -104,7 +104,6 @@ const filteredAnimus = computed(() => {
   })
 })
 
-// Calculer les pourcentages pour chaque fourchette de points
 const calculatePercentages = () => {
   const pointRanges = [
     { min: 0, max: 30 },
@@ -125,7 +124,6 @@ const calculatePercentages = () => {
       const isInRange = eggPoints >= range.min && eggPoints <= range.max
       const isMurakami = egg.bonusTraits.includes('Murakami Drip')
 
-      // Filtrer en fonction de mkBoost
       if (filters.value.mkBoost) {
         return isInRange && isMurakami
       } else {
@@ -136,7 +134,6 @@ const calculatePercentages = () => {
     const eggsInRange = filteredAnimus.value.filter((animus) => {
       const isInRange = animus.points >= range.min && animus.points <= range.max
 
-      // Filtrer en fonction de mkBoost
       if (filters.value.mkBoost) {
         return isInRange && animus.hasMurakamiDrip
       } else {
@@ -155,7 +152,6 @@ const calculatePercentages = () => {
   })
 }
 
-// Calculer les probabilités de révélation pour chaque fourchette de points en fonction des filtres
 const calculateProbabilities = () => {
   const pointRanges = [
     { min: 0, max: 30 },
@@ -170,14 +166,12 @@ const calculateProbabilities = () => {
     { min: 271, max: 300 }
   ]
 
-  // Calculer les probabilités brutes pour chaque tranche de points
   const rawProbabilities = pointRanges.map((range) => {
     const totalEggsInRange = lBoard.filter((egg) => {
       const eggPoints = Number(egg.points)
       const isInRange = eggPoints >= range.min && eggPoints <= range.max
       const isMurakami = egg.bonusTraits.includes('Murakami Drip')
 
-      // Filtrer en fonction de mkBoost
       if (filters.value.mkBoost) {
         return isInRange && isMurakami
       } else {
@@ -188,7 +182,6 @@ const calculateProbabilities = () => {
     const filteredEggsInRange = filteredAnimus.value.filter((animus) => {
       const isInRange = animus.points >= range.min && animus.points <= range.max
 
-      // Filtrer en fonction de mkBoost
       if (filters.value.mkBoost) {
         return isInRange && animus.hasMurakamiDrip
       } else {
@@ -270,6 +263,7 @@ const getTraitImage = (color, trait) => {
       :probabilities="probabilities"
       :filters="filters"
       :loading="loading"
+      :loading-message="loadingMessage"
     />
   </main>
 </template>

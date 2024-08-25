@@ -65,6 +65,12 @@
     cursor: pointer;
     transition: all 0.4s ease;
 
+    input {
+      &:hover {
+        cursor: pointer;
+      }
+    }
+
     .v-select {
       width: 100%;
       .vs__dropdown-toggle {

@@ -26,6 +26,10 @@ const props = defineProps({
   loading: {
     type: Boolean,
     default: () => false
+  },
+  loadingMessage: {
+    type: String,
+    default: () => "Loading..."
   }
 })
 
@@ -91,6 +95,6 @@ const title = computed(() => {
         </div>
       </li>
     </ul>
-    <div v-else>loading</div>
+    <div v-else>{{ loadingMessage }} </div>
   </div>
 </template>
