@@ -26,8 +26,8 @@ onBeforeMount(() => {
 onMounted(async () => {
   loading.value = true
   try {
-    loadingMessage.value = 'Retrieving all animus...'
-    await animusStore.getAnimus(burned.length)
+    // loadingMessage.value = 'Retrieving all animus...'
+    // await animusStore.getAnimus(burned.length)
     loadingMessage.value = 'Generate animus stats...'
     await enrichAnimusWithBurnedData()
     loadingMessage.value = 'Update animus database...'
@@ -106,16 +106,12 @@ const filteredAnimus = computed(() => {
 
 const calculatePercentages = () => {
   const pointRanges = [
-    { min: 0, max: 30 },
-    { min: 31, max: 60 },
-    { min: 61, max: 90 },
-    { min: 91, max: 120 },
-    { min: 121, max: 150 },
-    { min: 151, max: 180 },
-    { min: 181, max: 210 },
-    { min: 211, max: 240 },
-    { min: 241, max: 270 },
-    { min: 271, max: 300 }
+    { min: 0, max: 20 },
+    { min: 50, max: 60 },
+    { min: 64, max: 94 },
+    { min: 100, max: 130 },
+    { min: 144, max: 174 },
+    { min: 181, max: 300 }
   ]
 
   return pointRanges.map((range) => {
@@ -154,16 +150,12 @@ const calculatePercentages = () => {
 
 const calculateProbabilities = () => {
   const pointRanges = [
-    { min: 0, max: 30 },
-    { min: 31, max: 60 },
-    { min: 61, max: 90 },
-    { min: 91, max: 120 },
-    { min: 121, max: 150 },
-    { min: 151, max: 180 },
-    { min: 181, max: 210 },
-    { min: 211, max: 240 },
-    { min: 241, max: 270 },
-    { min: 271, max: 300 }
+     { min: 0, max: 20 },
+    { min: 50, max: 60 },
+    { min: 64, max: 94 },
+    { min: 100, max: 130 },
+    { min: 144, max: 174 },
+    { min: 181, max: 300 },
   ]
 
   const rawProbabilities = pointRanges.map((range) => {

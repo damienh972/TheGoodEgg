@@ -119,7 +119,7 @@ onMounted(async () => {
         </li>
         <li v-if="item.bonusTraits[0]">
           <img :src="getTraitImage('black', item.bonusTraits[0])" :alt="item.bonusTraits[0]" />
-          <p>{{ item.bonusTraits[0] }} DNA</p>
+          <p>{{ item.bonusTraits[0] }}</p>
 
           <img
             class="clone-pfp"

@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useLBoardStore } from '@/stores/leaderboard'
 import { useListingsStore } from '@/stores/listings'
 import { useUnrevealedStore } from '@/stores/unrevealed'
+import { useAnimusStore } from '@/stores/animus'
 import { EggsFilter, FindEgg, ShowResults } from '@components'
 
 console.log('%cHey there, curious developer!', 'color: green; font-size: 20px;')
@@ -14,6 +15,7 @@ console.log(
 const lBoardStore = useLBoardStore()
 const listingsStore = useListingsStore()
 const unrevealedStore = useUnrevealedStore()
+const animusStore = useAnimusStore()
 
 const eggId = ref('')
 const dnaTraits = ['Alien', 'Murakami', 'Undead', 'Reptile', 'Angel', 'Demon', 'Robot', 'Human']
@@ -25,6 +27,7 @@ const selectedPoints = ref(null)
 const filteredEggs = ref([])
 
 const loading = ref(false)
+const animusLoaded = ref(false)
 const loadingMessage = ref('Loading ...')
 const error = ref('')
 const filterOnSale = ref(false)
@@ -188,18 +191,20 @@ const refreshPage = () => {
 onMounted(async () => {
   loading.value = true
   try {
-    loadingMessage.value = 'Retrieving incubation datas...'
-    await lBoardStore.loadLBoard()
-    loadingMessage.value = 'Retrieving burned eggs...'
-    await unrevealedStore.loadBurned(lBoardStore.lBoard)
-    loadingMessage.value = 'Retrieving unrevealed eggs...'
-    await unrevealedStore.loadUnrevealed(lBoardStore.lBoard)
-    loadingMessage.value = 'Retrieving listings datas...'
-    await listingsStore.fetchListings()
-    loadingMessage.value = 'Check for new reveal...'
-    await unrevealedStore.updateBurnedAndUnrevealed(lBoardStore.lBoard)
-    loadingMessage.value = 'Initializing eggs results...'
-    await new Promise((resolve) => setTimeout(resolve, 200))
+    if (!unrevealedStore.unrevealed || unrevealedStore.unrevealed.length === 0) {
+      loadingMessage.value = 'Retrieving incubation datas...'
+      await lBoardStore.loadLBoard()
+      loadingMessage.value = 'Retrieving burned eggs...'
+      await unrevealedStore.loadBurned(lBoardStore.lBoard)
+      loadingMessage.value = 'Retrieving unrevealed eggs...'
+      await unrevealedStore.loadUnrevealed(lBoardStore.lBoard)
+      loadingMessage.value = 'Retrieving listings datas...'
+      await listingsStore.fetchListings()
+      loadingMessage.value = 'Check for new reveal...'
+      await unrevealedStore.updateBurnedAndUnrevealed(lBoardStore.lBoard)
+      loadingMessage.value = 'Initializing eggs results...'
+      await new Promise((resolve) => setTimeout(resolve, 200))
+    }
     applyFilters()
   } catch (error) {
     console.error('Error in onMounted:', error)
@@ -208,6 +213,10 @@ onMounted(async () => {
     loading.value = false
     updateRefreshStatus()
     intervalId.value = setInterval(updateRefreshStatus, 200)
+    if (!animusStore.animus || animusStore.animus.length === 0) {
+      await animusStore.getAnimus(unrevealedStore.burned.length)
+    }
+    animusLoaded.value = true
   }
 })
 
@@ -228,7 +237,12 @@ onUnmounted(() => {
 
   <header v-else>
     <h1>TheGoodEgg</h1>
-    <router-link class="link" to="/stats">Go to Stats</router-link>
+    <router-link
+      class="link"
+      :to=" '/stats'"
+      :class="{ disabled: !animusLoaded }"
+      >{{ animusLoaded ? 'Go to Stats' : 'Loading animus...' }}</router-link
+    >
     <nav>
       <FindEgg
         :egg-id="parseInt(eggId)"

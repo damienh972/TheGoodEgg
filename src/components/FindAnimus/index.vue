@@ -49,7 +49,7 @@ const getBonusTokenId = (tokenId) => {
       placeholder="Enter Animus ID"
       @input="updateAnimusId"
     />
-    <ul v-if="filteredAnimus">
+    <ul class="find-animus__list" v-if="filteredAnimus">
       <li>
         <img
           class="clone-pfp"
