@@ -29,7 +29,7 @@ const props = defineProps({
   },
   loadingMessage: {
     type: String,
-    default: () => "Loading..."
+    default: () => 'Loading...'
   }
 })
 
@@ -58,6 +58,10 @@ const isFiltered = computed(() => {
   return (
     props.filters.species || props.filters.aura || props.filters.generation || props.filters.element
   )
+})
+
+const displayInfo = computed(() => {
+  return isFiltered.value ? true : false
 })
 
 // Afficher les données en fonction de l'état des filtres
@@ -95,6 +99,9 @@ const title = computed(() => {
         </div>
       </li>
     </ul>
-    <div v-else>{{ loadingMessage }} </div>
+    <div v-else>{{ loadingMessage }}</div>
+    <p v-if="displayInfo" class="stats-info">
+      probabilities calculated from the current reveal of incubated eggs
+    </p>
   </div>
 </template>

@@ -69,15 +69,10 @@
         cursor: pointer;
       }
     }
-
     .v-select {
       width: 100%;
       .vs__dropdown-toggle {
         border: 2px solid #fed712 !important;
-        min-width: unset;
-        .vs__actions {
-        flex-wrap: wrap;
-      }
       }
       .vs__option:hover {
         background-color: #fed712 !important;
@@ -94,10 +89,6 @@
         text-transform: lowercase;
         font-variant: small-caps;
         min-width: 120px;
-      }
-
-      .vs__selected{
-        min-width: unset;
       }
       .vs__clear,
       .vs__open-indicator {
@@ -161,6 +152,12 @@
     flex-direction: column;
     transform: none;
 
+    .vs__selected {
+      min-width: unset !important;
+    }
+    .vs__dropdown-toggle {
+      min-width: unset;
+    }
     h2 {
       padding: 20px 0;
     }

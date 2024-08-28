@@ -40,6 +40,12 @@
     right: 50%;
     transform: translateX(50%);
   }
+  .stats-info {
+    text-align: left;
+    font-size: 10px;
+    margin-top: 15px;
+    font-style: italic;
+  }
 }
 
 @media only screen and (min-width: 769px) {

@@ -53,7 +53,7 @@ const toggleMenu = () => {
 
 // Easter egg game logic
 const correctCombinationHash = 'a48200d635b2095908f40ecd61be337a14f956c0de98fffa28402fbb7f9ce22f'
-const correctEggNumberHash = '480ec4228ea35503bf34482bbd25f91d19de83a8b638123014890645ead08aa4'
+const correctEggNumberHash = 'a5e3e3898bf3bb3ff30f18b41419a8dff65495cb4238a19aeec430e454946835'
 
 const hashString = async (str) => {
   const encoder = new TextEncoder()
