@@ -33,3 +33,9 @@
   width: 100px;
   margin-bottom: 10px;
 }
+
+@media only screen and (min-width: 769px) {
+  .find-animus {
+    border-radius: 15px;
+  }
+}
