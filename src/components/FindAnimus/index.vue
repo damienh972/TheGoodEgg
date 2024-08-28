@@ -56,19 +56,20 @@ const getBonusTokenId = (tokenId) => {
           :src="`https://animus-assets.rtfkt.com/images/${internalAnimusId}.png`"
           alt="animus"
         />
-
         <p>{{ getPoints(filteredAnimus.tokenId) }} pts</p>
         <a
           :href="`https://magiceden.io/item-details/ethereum/0x49cf6f5d44e70224e2e23fdcdd2c053f30ada28b/${getBonusTokenId(filteredAnimus.tokenId)}`"
           target="blank"
         >
           <img
+            v-if="getBonusTokenId(filteredAnimus.tokenId) !== 'N/A'"
             class="clone-pfp"
             v-lazy="
               `https://clonex-assets.rtfkt.com/images/${getBonusTokenId(filteredAnimus.tokenId)}.png`
             "
             alt="clone pfp"
           />
+          <p v-else>No clone</p>
         </a>
       </li>
     </ul>
