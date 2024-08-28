@@ -1,6 +1,6 @@
 // src/store/index.js
 import { defineStore } from 'pinia'
-import { fetchBurnedIds, updateBurnedIds, fetchUnrevealedIds, updateUnrevealedIds } from '@/api/index.js'
+import { fetchBurnedIds, updateBurnedIds, fetchUnrevealedIds, updateUnrevealedIds } from '../api'
 import { GET_BURNED } from '@/subgraph'
 
 export const useUnrevealedStore = defineStore('unrevealed', {
