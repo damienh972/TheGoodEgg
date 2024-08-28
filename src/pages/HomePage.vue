@@ -18,6 +18,7 @@ const unrevealedStore = useUnrevealedStore()
 const animusStore = useAnimusStore()
 
 const eggId = ref('')
+const maintenanceMessage = ref('Oops, the site is currently under maintenance.')
 const dnaTraits = ['Alien', 'Murakami', 'Undead', 'Reptile', 'Angel', 'Demon', 'Robot', 'Human']
 
 const boostTraits = ['Murakami Drip', 'Helmet', 'Snake', 'Artist Edition']
@@ -206,11 +207,13 @@ onMounted(async () => {
       await new Promise((resolve) => setTimeout(resolve, 200))
     }
     applyFilters()
+    loading.value = false
   } catch (error) {
     console.error('Error in onMounted:', error)
     error.value = error
+    loadingMessage.value = maintenanceMessage.value
+    loading.value = true
   } finally {
-    loading.value = false
     updateRefreshStatus()
     intervalId.value = setInterval(updateRefreshStatus, 200)
     if (!animusStore.animus || animusStore.animus.length === 0) {
