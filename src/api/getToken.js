@@ -1,6 +1,6 @@
 export async function getToken() {
   try {
-    const response = await fetch('https://thegoodegg.vercel.app/auth/token', {
+    const response = await fetch('http://localhost:3000/auth/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
