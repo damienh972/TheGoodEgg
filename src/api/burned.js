@@ -1,6 +1,6 @@
 import { getToken } from './getToken'
 
-const burnedUrl = 'http://localhost:3000/burned'
+const burnedUrl = 'https://thegoodegg.vercel.app/burned'
 
 export async function fetchBurnedIds() {
   const token = await getToken()

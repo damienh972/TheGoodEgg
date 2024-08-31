@@ -1,7 +1,6 @@
 import { getToken } from './getToken'
 
-// const unrevealedUrl = 'https://thegoodegg.vercel.app/unrevealed'
-const unrevealedUrl = 'http://localhost:3000/unrevealed'
+const unrevealedUrl = 'https://thegoodegg.vercel.app/unrevealed'
 export async function fetchUnrevealedIds() {
   const token = await getToken()
 

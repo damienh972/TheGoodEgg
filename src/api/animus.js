@@ -1,6 +1,6 @@
 import { getToken } from './getToken'
 
-const animusUrl = 'http://localhost:3000/animus'
+const animusUrl = 'https://thegoodegg.vercel.app/animus'
 
 export async function fetchAnimus(maxPages) {
   const token = await getToken()
